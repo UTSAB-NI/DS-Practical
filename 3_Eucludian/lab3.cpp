@@ -1,40 +1,91 @@
 #include <iostream>
 using namespace std;
-int a,b,x,y,r;
-void gcd()
+
+class Euclidean
 {
+protected:
+    int a, b, temp;
 
- x=a;
- y=b;
- while (y!=0)
- {
- r=x % y;
- x=y;
- y=r;
- }
+public:
+    void takeInput()
+    {
+        cout << "Enter A and B: ";
+        cin >> a >> b;
+        cout << "Assuming A = " << a << " and b = " << b << endl;
+    }
+    int calculate()
+    {
+        if (b == 0)
+            return a;
+        else
+        {
+            temp = b;
+            b = a % b;
+            a = temp;
+            return calculate();
+        }
+    }
+};
 
- cout << "GCD(" << a << ", " << b << ") = " << x << endl;
-}
-int gcdExtended(int a, int b, int *x, int *y){
- if ( a == 0){
- *x=0;
- *y=1;
- return b;
- }
- int x3 , y3;
- int hcf =gcdExtended(b%a, a, &x3, &y3);
+class ExtendedEuclidean : public Euclidean
+{
+public:
+    int s1 = 1, s2 = 0, s, t1 = 0, t2 = 1, t, q; // q is quotient, s and t are from sa+tb=gcd(a,b)
+    int calculate()
+    {
+        if (b == 0)
+        {
+            return a;
+        }
+        else
+        {
+            q = a / b;
+            s = s1 - q * s2;
+            t = t1 - q * t2;
+            s1 = s2;
+            s2 = s;
+            t1 = t2;
+            t2 = t;
+            temp = b;
+            b = a % b;
+            a = temp;
+            return calculate();
+        }
+    }
+};
 
- *x = y3 - (b/a) * x3;
- *y = x3;
- return hcf;
-}
 int main()
 {
- cout<<"Enter First number 'a':"<<endl;
- cin>>a;
- cout<<"Enter Second number 'b':"<<endl;
- cin>>b;
- gcd();
- cout << "The extended GCD(" << a << ", " << b << ") = " << gcdExtended(a,b, &x, &y) <<
-endl;
+    char ans;
+    int opType, gcd;
+    do
+    {
+        Euclidean e;
+        ExtendedEuclidean ee;
+        cout << "What type of operation would you like to perform?" << endl;
+        cout << "1. Euclidean\n2. Extended Euclidean\n";
+        cin >> opType;
+        switch (opType)
+        {
+        case 1:
+            e.takeInput();
+            gcd = e.calculate();
+            cout << "The gcd is " << gcd << endl;
+            break;
+        case 2:
+            ee.takeInput();
+            gcd = ee.calculate();
+            cout << "GCD is: " << gcd << endl
+                 << "s is: " << ee.s1 << ", t is: " << ee.t1 << endl; // the values of s1 and t1 at last is value of s and t
+            break;
+        default:
+            cout << "Enter valid option\n";
+            break;
+        }
+        cout << "Repeat again? (y/n)\n";
+        cin >> ans;
+    } while (tolower(ans) == 'y');
+    return 0;
 }
+
+
